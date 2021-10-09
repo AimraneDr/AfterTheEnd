@@ -17,6 +17,7 @@ public class CameraController : MonoBehaviour
     private Vector3 newPosition;
     private Quaternion newRotation;
     private Vector3 newZoom;
+    private Vector3 StartDragPosition, CurrentDragPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -29,10 +30,11 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        MovementInputHandeler();
+        MouseInputsHaandler();
+        KeyboardInputsHandeler();
     }
 
-    void MovementInputHandeler()
+    void KeyboardInputsHandeler()
     {
         if (Input.GetKey(KeyCode.LeftShift))
         {
@@ -95,5 +97,33 @@ public class CameraController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, newPosition, MovementTime * Time.deltaTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, MovementTime * Time.deltaTime);
         Cam.localPosition = Vector3.Lerp(Cam.localPosition, newZoom, MovementTime * Time.deltaTime);
+    }
+
+    void MouseInputsHaandler()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Plane plan = new Plane(Vector3.up, Vector3.zero);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float entry;
+            if(plan.Raycast(ray, out entry))
+            {
+                StartDragPosition = ray.GetPoint(entry);
+            }
+            Debug.Log("000000000000");
+        }
+        if (Input.GetMouseButton(0))
+        {
+            Plane plan = new Plane(Vector3.up, Vector3.zero);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float entry;
+            if (plan.Raycast(ray, out entry))
+            {
+                CurrentDragPosition = ray.GetPoint(entry);
+
+                newPosition = transform.position + StartDragPosition - CurrentDragPosition;
+            }
+            Debug.Log("1111111111");
+        }
     }
 }

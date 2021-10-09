@@ -91,14 +91,10 @@ public class GridXZ<TGridObject>
         if (x >= 0 && z >= 0 && x < Width && z < Height)
         {
             GridArray[x, z] = value;
-            //TriggerGridObjectChanged(x, z);
+
         }
     }
 
-    //public void TriggerGridObjectChanged(int x, int z)
-    //{
-    //    OnGridObjectChanged?.Invoke(this, new OnGridObjectChangedEventArgs { x = x, z = z });
-    //}
 
     public void SetGridObject(Vector3 worldPosition, TGridObject value)
     {

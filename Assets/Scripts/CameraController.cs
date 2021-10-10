@@ -17,7 +17,9 @@ public class CameraController : MonoBehaviour
     private Vector3 newPosition;
     private Quaternion newRotation;
     private Vector3 newZoom;
-    private Vector3 StartDragPosition, CurrentDragPosition;
+    private float old_z_zoom;
+    private Vector3 DragStartPosition, DragCurrentPosition;
+    private Vector3 RotationStartPostion, RotationCurrenetPostion;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +32,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        old_z_zoom = newZoom.z;
         MouseInputsHaandler();
         KeyboardInputsHandeler();
     }
@@ -74,26 +77,18 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.R) )
         {
-            float old_z_zoom = newZoom.z;
             newZoom += ZoomAmmount;
-            newZoom.y = Mathf.Clamp(newZoom.y, MinHeight, MaxHeight);
-            if(newZoom.y == MinHeight || newZoom.y == MaxHeight)
-            {
-                newZoom.z = old_z_zoom;
-            }
         }
 
         if (Input.GetKey(KeyCode.F) )
         {
-            float old_z_zoom = newZoom.z;
             newZoom -= ZoomAmmount;
-            newZoom.y = Mathf.Clamp(newZoom.y, MinHeight, MaxHeight);
-            if (newZoom.y == MinHeight || newZoom.y == MaxHeight)
-            {
-                newZoom.z = old_z_zoom;
-            }
         }
-
+        newZoom.y = Mathf.Clamp(newZoom.y, MinHeight, MaxHeight);
+        if (newZoom.y == MinHeight || newZoom.y == MaxHeight)
+        {
+            newZoom.z = old_z_zoom;
+        }
         transform.position = Vector3.Lerp(transform.position, newPosition, MovementTime * Time.deltaTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, MovementTime * Time.deltaTime);
         Cam.localPosition = Vector3.Lerp(Cam.localPosition, newZoom, MovementTime * Time.deltaTime);
@@ -101,6 +96,10 @@ public class CameraController : MonoBehaviour
 
     void MouseInputsHaandler()
     {
+        if(Input.mouseScrollDelta.y != 0)
+        {
+            newZoom += Input.mouseScrollDelta.y * ZoomAmmount;
+        }
         if (Input.GetMouseButtonDown(0))
         {
             Plane plan = new Plane(Vector3.up, Vector3.zero);
@@ -108,9 +107,8 @@ public class CameraController : MonoBehaviour
             float entry;
             if(plan.Raycast(ray, out entry))
             {
-                StartDragPosition = ray.GetPoint(entry);
+                DragStartPosition = ray.GetPoint(entry);
             }
-            Debug.Log("000000000000");
         }
         if (Input.GetMouseButton(0))
         {
@@ -119,11 +117,17 @@ public class CameraController : MonoBehaviour
             float entry;
             if (plan.Raycast(ray, out entry))
             {
-                CurrentDragPosition = ray.GetPoint(entry);
+                DragCurrentPosition = ray.GetPoint(entry);
 
-                newPosition = transform.position + StartDragPosition - CurrentDragPosition;
+                newPosition = transform.position + DragStartPosition - DragCurrentPosition;
             }
-            Debug.Log("1111111111");
+        }
+        if (Input.GetMouseButtonDown(2))
+        {
+            RotationCurrenetPostion = Input.mousePosition;
+            Vector3 difference = RotationStartPostion - RotationCurrenetPostion;
+            RotationStartPostion = RotationCurrenetPostion;
+            newRotation *= Quaternion.Euler(Vector3.up * (difference.x / 10f));
         }
     }
 }

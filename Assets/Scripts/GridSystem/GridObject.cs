@@ -6,7 +6,7 @@ public class GridObject
 {
     private GridXZ<GridObject> grid;
     private int x, z;
-    private Transform HoldedObject;
+    private GameObject HoldedObject;
     public bool CanBuild { get { return HoldedObject == null; } }
 
     public GridObject(GridXZ<GridObject> _grid, int _x, int _z)
@@ -16,11 +16,11 @@ public class GridObject
         z = _z;
     }
 
-    public void SetHoldedObject(Transform obj)
+    public void SetHoldedObject(GameObject obj)
     {
         HoldedObject= obj;
     }
-    public Transform GetHoldedObject()
+    public GameObject GetHoldedObject()
     {
         return HoldedObject;
     }

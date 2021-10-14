@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "EmptyTemplate", menuName = "Buildable Objects/EmptyTemplate")]
 public class PlacableObject : ScriptableObject
 {
     public string Name;
-    public Transform Prephab;
+    public GameObject Prephab;
     public int Width, Length, Height;
 
     private Vector2Int Origin;
-    private Direction Dir;
     private List<GridObject> BookedUpPlaces;
     private GridXZ<GridObject> GridReference;
 
@@ -20,31 +20,19 @@ public class PlacableObject : ScriptableObject
         GridReference = GridRef;
     }
 
-    public void Create(Vector3 SpawnAtWorldPosition, Vector2Int offset, Direction dir, out Transform FinalObj)
+    public void CreateCopy(Vector3 SpawnAtWorldPosition, Vector2Int offset, Direction dir, out GameObject FinalObj)
     {
         Origin = offset;
-        Transform obj = Instantiate(
+        GameObject obj = Instantiate(
             Prephab,
             SpawnAtWorldPosition,
             Quaternion.Euler(0, GetRotationAngle(dir), 0)
 
             );
-        //BuildableObject component = obj.gameObject.AddComponent<BuildableObject>() as BuildableObject;
-        //component.SetProperties(Origin, dir, BookUpGridPlaces(Origin, dir));
-
-        //BookUpPlaces(Origin, dir);
+        ObjectInfo component = obj.gameObject.AddComponent<ObjectInfo>() as ObjectInfo;
+        component.SetProperties(Origin, dir, BookUpGridPlaces(Origin, dir));
 
         FinalObj = obj;
-    }
-    public void DestroySelf()
-    {
-        //Debug.Log($"Check Holded Grid Objects , lenth of ({BookedUpPlaces.Count})");
-        foreach (GridObject item in BookedUpPlaces)
-        {
-            item.ClearHoldedObject();
-            //Debug.Log("Object had been destroyed");
-        }
-        Destroy(this);
     }
 
     //public List<Vector2Int> BookUpPlaces(Vector2Int offset, Direction dir)

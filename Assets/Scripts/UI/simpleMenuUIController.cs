@@ -5,28 +5,29 @@ using UnityEngine.UI;
 
 public class simpleMenuUIController : MonoBehaviour
 {
-    public Button button;
-    public GameObject scrollView;
 
-    bool scroll_view_is_visible;
+    public GameObject UI_Handler;
 
     // Start is called before the first frame update
     void Start()
     {
-        scroll_view_is_visible = false;
-        button.onClick.AddListener(OnButtonClick);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-       
+        ListenToInputs();
     }
 
-    public void OnButtonClick()
+    void ListenToInputs()
     {
-        Debug.Log("Event fired up");
-        scrollView.SetActive(!scroll_view_is_visible);
-        scroll_view_is_visible = !scroll_view_is_visible;
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            UI_Handler.SetActive(!UI_Handler.activeSelf);
+            if(UI_Handler.activeSelf) Time.timeScale = 0;
+            else Time.timeScale = 1;
+        }
     }
+
 }

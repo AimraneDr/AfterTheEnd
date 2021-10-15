@@ -32,8 +32,11 @@ public class BuildingSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ChangeSelectedObjectWithInpus();
-        IputsHandler();
+        if (!Administration.Game.GameIsStoped())
+        {
+            ChangeSelectedObjectWithInpus();
+            IputsHandler();
+        }
     }
 
     void ChangeSelectedObjectWithInpus()

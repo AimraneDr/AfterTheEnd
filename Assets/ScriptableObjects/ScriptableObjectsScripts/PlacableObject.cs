@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "EmptyTemplate", menuName = "Buildable Objects/EmptyTemplate")]
-public class PlacableObject : ScriptableObject
+public class PlacableObject : Item
 {
-    public string Name;
-    public GameObject Prephab;
     public int Width, Length, Height;
-
+    
     private Vector2Int Origin;
     private List<GridObject> BookedUpPlaces;
     private GridXZ<GridObject> GridReference;
 
 
     public enum Direction { Forward, right, Back, Left, }
+
+    public PlacableObject()
+    {
+        ItemType = Type.PickableOnly;
+        
+    }
     public void SetGridRef(GridXZ<GridObject> GridRef)
     {
         GridReference = GridRef;
@@ -24,46 +28,17 @@ public class PlacableObject : ScriptableObject
     {
         Origin = offset;
         GameObject obj = Instantiate(
-            Prephab,
+            Graphics,
             SpawnAtWorldPosition,
             Quaternion.Euler(0, GetRotationAngle(dir), 0)
 
             );
-        ObjectInfo component = obj.gameObject.AddComponent<ObjectInfo>() as ObjectInfo;
+        PlacementInfo component = obj.gameObject.AddComponent<PlacementInfo>() as PlacementInfo;
         component.SetProperties(Origin, dir, BookUpGridPlaces(Origin, dir));
 
         FinalObj = obj;
     }
 
-    //public List<Vector2Int> BookUpPlaces(Vector2Int offset, Direction dir)
-    //{
-    //    List<Vector2Int> positions = new List<Vector2Int>();
-    //    switch (dir)
-    //    {
-    //        case Direction.Forward:
-    //        case Direction.Back:
-    //            for (int x = 0; x < Width; x++)
-    //            {
-    //                for (int z = 0; z < Length; z++)
-    //                {
-    //                    positions.Add(offset + new Vector2Int(x, z));
-    //                }
-    //            }
-    //            break;
-    //        case Direction.right:
-    //        case Direction.Left:
-    //            for (int x = 0; x < Length; x++)
-    //            {
-    //                for (int z = 0; z < Width; z++)
-    //                {
-    //                    positions.Add(offset + new Vector2Int(x, z));
-    //                }
-    //            }
-    //            break;
-    //    }
-
-    //    return positions;
-    //}
     public List<GridObject> BookUpGridPlaces(Vector2Int offset, Direction dir)
     {
         List<GridObject> positions = new List<GridObject>();

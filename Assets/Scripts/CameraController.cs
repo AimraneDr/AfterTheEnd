@@ -33,8 +33,11 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         old_z_zoom = newZoom.z;
-        MouseInputsHaandler();
-        KeyboardInputsHandeler();
+        if (!Administration.Game.GameIsStoped())
+        {
+            MouseInputsHaandler();
+            KeyboardInputsHandeler();
+        }
     }
 
     void KeyboardInputsHandeler()

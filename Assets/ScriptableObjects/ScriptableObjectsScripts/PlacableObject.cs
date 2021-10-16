@@ -6,7 +6,11 @@ using UnityEngine;
 public class PlacableObject : Item
 {
     public int Width, Length, Height;
-    
+    [HideInInspector]
+    public MeshRenderer Mesh_Renderer;
+
+    public int Cost;
+
     private Vector2Int Origin;
     private List<GridObject> BookedUpPlaces;
     private GridXZ<GridObject> GridReference;
@@ -17,7 +21,6 @@ public class PlacableObject : Item
     public PlacableObject()
     {
         ItemType = Type.PickableOnly;
-        
     }
     public void SetGridRef(GridXZ<GridObject> GridRef)
     {

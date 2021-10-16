@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PauseMenu : MonoBehaviour
 {
 
-    public GameObject UI_Handler,SlotsHolder;
+    public GameObject BuildingMenu,SlotsHolder;
     
 
 
@@ -15,20 +15,23 @@ public class PauseMenu : MonoBehaviour
     void Start()
     {
         RenderInventory();
+        BuildingMenu.SetActive(false);
+        Administration.Game.Continue();
     }
 
     // Update is called once per frame
     void Update()
     {
         ListenToInputs();
+       
     }
 
     void ListenToInputs()
     {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            UI_Handler.SetActive(!UI_Handler.activeSelf);
-            if(UI_Handler.activeSelf) Administration.Game.Stop();
+            BuildingMenu.SetActive(!BuildingMenu.activeSelf);
+            if(BuildingMenu.activeSelf) Administration.Game.Stop();
             else Administration.Game.Continue();
         }
     }
@@ -46,8 +49,15 @@ public class PauseMenu : MonoBehaviour
                 false
                 );
             SlotInfo info = obj.GetComponent<SlotInfo>();
+            info.Ref = list[i];
             info.NameMesh.text = list[i]?.Name;
-            info.image = list[i]?.image;
+            info.image.sprite = list[i]?.Icon;
+            info.OnSlotClick += (sender) =>
+              {
+                  GameObject.Find("BuildingSystemObject").GetComponent<BuildingSystem>().SelectedObject = info.Ref;
+                  BuildingMenu.SetActive(false);
+                  Administration.Game.Continue();
+              };
         }
     }
 

@@ -7,7 +7,7 @@ public class BuildingSystem : MonoBehaviour
     public LayerMask MoseColliderLayerMask;
     public List<PlacableObject> ObjectsList;
     
-    private PlacableObject SelectedObject;
+    public PlacableObject SelectedObject;
 
     private PlacableObject.Direction Dir;
 
@@ -17,6 +17,13 @@ public class BuildingSystem : MonoBehaviour
     float CellSize = 1f;
 
     private GridXZ<GridObject> grid;
+
+    public Accounter AccounterObj;
+
+    public Material CanBuildMaterial, CanNotBuildMaterial;
+    bool temporraryObjIsCreated = false;
+    GameObject temporraryObj = null;
+    int temporraryId = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -34,26 +41,64 @@ public class BuildingSystem : MonoBehaviour
     {
         if (!Administration.Game.GameIsStoped())
         {
-            ChangeSelectedObjectWithInpus();
-            IputsHandler();
+            TemporraryVisual();
+            if (SelectedObject != null)
+            {
+                IputsHandler();
+            }
+                
         }
     }
 
-    void ChangeSelectedObjectWithInpus()
+    void TemporraryVisual()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (SelectedObject != null)
         {
-            SelectedObject = ObjectsList[0];
+            Vector3 temporrary_position = GetMouseWorldPosition();
+            if (temporrary_position.x <= grid.GetWidth() && temporrary_position.z <= grid.GetHeight())
+            {
+                grid.GetXZ(temporrary_position, out int x, out int z);
+                Vector2Int offset = new Vector2Int(x, z);
+                List<Vector2Int> grid_positions = SelectedObject.GetImaginaryBookedUpPlacesList(offset, Dir);
+
+                bool canBuild = true;
+                foreach (Vector2Int grid_p in grid_positions)
+                {
+                    if (!grid.GetGridObject(grid_p.x, grid_p.y).CanBuild) { canBuild = false; break; }
+                }
+
+                Vector2Int RotationOffset = SelectedObject.GetRotationOffset(Dir);
+                Vector3 SpawnAtWorldPosition = grid.GetWorldPosition(x, z) + new Vector3(RotationOffset.x, 0.5f, RotationOffset.y) * grid.GetCellSize();
+                if (!temporraryObjIsCreated || temporraryId != SelectedObject.ID) 
+                {
+                    temporraryId = SelectedObject.ID;
+                    Destroy(temporraryObj);
+                    SelectedObject.CreateCopy(SpawnAtWorldPosition, offset, Dir, out temporraryObj);
+                    temporraryObjIsCreated = true;
+                }
+                else
+                {
+                    temporraryObj.transform.position = SpawnAtWorldPosition;
+                }
+
+                if (canBuild)
+                {
+                    temporraryObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = CanBuildMaterial;
+                }
+                else
+                {
+                    temporraryObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = CanNotBuildMaterial;
+                }
+            }
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        else
         {
-            SelectedObject = ObjectsList[1];
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SelectedObject = ObjectsList[2];
+            temporraryObj = null;
         }
     }
+
+
+
     void IputsHandler()
     {
         float MaxHoldTime = 0.5f, HoldTime = 0;
@@ -77,12 +122,14 @@ public class BuildingSystem : MonoBehaviour
                     Vector2Int RotationOffset = SelectedObject.GetRotationOffset(Dir);
                     Vector3 SpawnAtWorldPosition = grid.GetWorldPosition(x, z) + new Vector3(RotationOffset.x, 0, RotationOffset.y) * grid.GetCellSize();
 
-                    //need to change the way i instantiate the objects
-                    SelectedObject.CreateCopy(SpawnAtWorldPosition, offset, Dir, out GameObject obj);
-                    foreach (Vector2Int item in grid_positions)
+                    if (AccounterObj.GetCurrentMonnyAmmount() >= SelectedObject.Cost)
                     {
-                        grid.GetGridObject(item.x, item.y).SetHoldedObject(obj);
-
+                        SelectedObject.CreateCopy(SpawnAtWorldPosition, offset, Dir, out GameObject obj);
+                        foreach (Vector2Int item in grid_positions)
+                        {
+                            grid.GetGridObject(item.x, item.y).SetHoldedObject(obj);
+                        }
+                        AccounterObj.PayBill(SelectedObject.Cost);
                     }
                 }
 

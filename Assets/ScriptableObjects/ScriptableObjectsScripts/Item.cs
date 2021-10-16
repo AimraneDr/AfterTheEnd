@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class Item : ScriptableObject
 {
+    public int ID;
     public string Name;
-    public Image image;
+    public Sprite Icon;
     public GameObject Graphics;
     public Type ItemType;
     public enum Type

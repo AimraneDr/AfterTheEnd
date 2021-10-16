@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53cde1f8a8e776f4b9e033249c08dd7b, type: 3}
   m_Name: Cube2x1
   m_EditorClassIdentifier: 
+  ID: 2
   Name: cube2x1
-  Prephab: {fileID: 7762226574669460760, guid: 8862f7243e7fd0f4bbe3e59f7cf4565f, type: 3}
+  Icon: {fileID: 21300000, guid: 845582caff3d2c94c88d44dbd54c71a1, type: 3}
+  Graphics: {fileID: 7762226574669460760, guid: 8862f7243e7fd0f4bbe3e59f7cf4565f, type: 3}
+  ItemType: 2
   Width: 2
   Length: 1
   Height: 1
+  Mesh_Renderer: {fileID: 0}
+  Cost: 10

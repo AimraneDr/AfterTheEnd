@@ -36,6 +36,7 @@ public class PlacableObject : Item
             Quaternion.Euler(0, GetRotationAngle(dir), 0)
 
             );
+        obj.layer = LayerMask.NameToLayer("Buildings");
         PlacementInfo component = obj.gameObject.AddComponent<PlacementInfo>() as PlacementInfo;
         component.SetProperties(Origin, dir, BookUpGridPlaces(Origin, dir));
 

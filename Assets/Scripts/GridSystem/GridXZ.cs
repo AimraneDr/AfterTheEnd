@@ -120,6 +120,19 @@ public class GridXZ<TGridObject>
         GetXZ(worldPosition, out x, out z);
         return GetGridObject(x, z);
     }
+    
+    public void GetNeighbors(int x,int y ,out TGridObject Up,out TGridObject RightUp, out TGridObject Right, out TGridObject RightDown, out TGridObject Down, out TGridObject LeftDown, out TGridObject Left, out TGridObject LeftUp)
+    {
+
+        Up = GetGridObject(x, y + 1);
+        RightUp = GetGridObject(x + 1, y + 1);
+        Right = GetGridObject(x + 1, y);
+        RightDown = GetGridObject(x + 1, y - 1);
+        Down = GetGridObject(x, y - 1);
+        LeftDown = GetGridObject(x - 1, y - 1);
+        Left = GetGridObject(x - 1, y);
+        LeftUp = GetGridObject(x - 1, y + 1);
+    }
 
     public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
     {

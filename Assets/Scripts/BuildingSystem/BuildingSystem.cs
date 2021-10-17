@@ -89,6 +89,7 @@ public class BuildingSystem : MonoBehaviour
                 {
                     temporraryObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = CanNotBuildMaterial;
                 }
+
             }
         }
         else
@@ -150,7 +151,7 @@ public class BuildingSystem : MonoBehaviour
     private Vector3 GetMouseWorldPosition()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, 1000f, MoseColliderLayerMask))
+        if (Physics.Raycast(ray, out RaycastHit hitInfo, 2000f, MoseColliderLayerMask))
         {
             return hitInfo.point;
         }

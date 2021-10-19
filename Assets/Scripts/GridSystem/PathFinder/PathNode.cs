@@ -11,49 +11,31 @@ public class PathNode
     public PathNode CameFromNode;
     public bool IsWalkable;
 
-    //neighbors
-    private static PathNode 
-        UpNeighbor = null, 
-        UpRightNeighbor = null,
-        RightNeighbor = null,
-        RightDownNeighbor = null,
-        DownNeighbor = null,
-        LeftDownNeighbor = null,
-        LeftNeighbor = null, 
-        LeftUpNeighbor = null
-        ;
-    public List<PathNode> Neighbors = new List<PathNode>()
-    {
-        UpNeighbor,
-        UpRightNeighbor,
-        RightNeighbor,
-        RightDownNeighbor,
-        DownNeighbor,
-        LeftDownNeighbor,
-        LeftNeighbor,
-        LeftUpNeighbor
-    };
+    ////neighbors
+    //private static PathNode 
+    //    UpNeighbor = null, 
+    //    UpRightNeighbor = null,
+    //    RightNeighbor = null,
+    //    RightDownNeighbor = null,
+    //    DownNeighbor = null,
+    //    LeftDownNeighbor = null,
+    //    LeftNeighbor = null, 
+    //    LeftUpNeighbor = null
+    //    ;
+    public List<PathNode> Neighbors;
 
     public PathNode(GridXZ<PathNode> _grid,int _x,int _y)
     {
         grid = _grid;
         x = _x;
         y = _y;
-        grid.GetNeighbors(
-            x,
-            y,
-            out UpNeighbor,
-            out UpRightNeighbor,
-            out RightNeighbor,
-            out RightDownNeighbor,
-            out DownNeighbor,
-            out LeftDownNeighbor,
-            out LeftNeighbor,
-            out LeftUpNeighbor
-            );
+        //Neighbors = grid.GetNeighbors(x, y);
 
     }
-
+    public void SetNeighbors()
+    {
+        Neighbors = grid.GetNeighbors(x, y);
+    }
     public void CalculateFCost()
     {
         F_Cost = G_Cost + H_Cost;

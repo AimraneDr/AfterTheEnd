@@ -14,7 +14,14 @@ public class GridPathFinder
 
     public GridPathFinder(int width, int height)
     {
-        grid = new GridXZ<PathNode>(width, height, 1f, Vector3.zero, (GridXZ<PathNode> g, int x, int y) => new PathNode(g, x, y));
+        grid = new GridXZ<PathNode>(
+            width, 
+            height, 
+            1f, 
+            Vector3.zero, 
+            (GridXZ<PathNode> g, int x, int y) => new PathNode(g, x, y)
+            );
+        //grid.DebugIsVisible = true;
 
     }
 
@@ -45,17 +52,13 @@ public class GridPathFinder
             PathNode CurrentNode = GetLowestFcostNode(OpenNodes);
             if (CurrentNode == endNode)
             {
-                Debug.Log("a Path had been found");
                 return CalculatePath(endNode);
             }
 
             OpenNodes.Remove(CurrentNode);
             ClosedNodes.Add(CurrentNode);
+           //CurrentNode.SetNeighbors();
 
-            foreach (PathNode neighbor in CurrentNode.Neighbors)
-            {
-                Debug.Log($"neighbor is null = {neighbor == null}");
-            }
             foreach (PathNode neighbor in CurrentNode.Neighbors)
             {
                 if (ClosedNodes.Contains(neighbor)) continue;
@@ -73,7 +76,6 @@ public class GridPathFinder
             }
 
         }
-        Debug.Log("No PathFound");
         return null;
     }
 

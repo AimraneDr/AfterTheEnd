@@ -18,19 +18,17 @@ public class EnemyController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Mouse Button Down");
             Vector3 pos = GetMouseWorldPosition();
 
             path_finder.GetGrid().GetXZ(transform.position, out int s_x, out int s_y);
             path_finder.GetGrid().GetXZ(pos, out int x, out int y);
-            
+            //Debug.Log($"{s_x} , {s_y} // {x} , {y}");
             List<PathNode> path = path_finder.FindPath(s_x, s_y, x, y);
             if (path != null)
             {
                 for (int i = 0; i < path.Count - 1; i++)
                 {
-                    Debug.Log($"{path[i].x} , {path[i].y} to {path[i + 1].x} , {path[i + 1].y}");
-                    Debug.DrawLine(new Vector3(path[i].x, 0.5f, path[i].y) * 10f + Vector3.one * 0.5f, new Vector3(path[i + 1].x, 0.5f, path[i + 1].y) * 10f + Vector3.one * 0.5f,Color.red);
+                    Debug.DrawLine(new Vector3(path[i].x, 0, path[i].y) * 1f + Vector3.one * 0.5f, new Vector3(path[i + 1].x, 0, path[i + 1].y) * 1f + Vector3.one * 0.5f,Color.red,100f);
                 }
             }
         }

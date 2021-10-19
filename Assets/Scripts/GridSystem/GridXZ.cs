@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,12 +20,14 @@ public class GridXZ<TGridObject>
     private int Height;
     private float CellSize;
     private Vector3 OriginPosition;
-    private TGridObject[,] GridArray;
+    public TGridObject[,] GridArray;
+
+
 
     public GridXZ(int width, int height, float cell_size, Vector3 originPosition, Func<GridXZ<TGridObject>, int, int, TGridObject> createGridObject)
     {
         Width = width;
-        Height = height;    
+        Height = height;
         CellSize = cell_size;
         OriginPosition = originPosition;
         GridArray = new TGridObject[width, height];
@@ -40,7 +41,20 @@ public class GridXZ<TGridObject>
         }
 
         debugIsVisible = false;
-       
+
+        foreach (TGridObject obj in GridArray)
+        {
+            try
+            {
+                PathNode node = obj as PathNode;
+                if (node != null)
+                {
+                    node.SetNeighbors();
+                    //Debug.Log(node.Neighbors.Count);
+                }
+            }
+            catch (Exception ex) { Debug.Log(ex.Message); }
+        }
     }
 
     private void SwitchDebugVisibility()
@@ -51,12 +65,12 @@ public class GridXZ<TGridObject>
             {
                 for (int z = 0; z < GridArray.GetLength(1); z++)
                 {
-                    Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z + 1), Color.red, 100f);
-                    Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x + 1, z), Color.red, 100f);
+                    Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z + 1), Color.blue, 1000f);
+                    Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x + 1, z), Color.blue, 1000f);
                 }
             }
-            Debug.DrawLine(GetWorldPosition(0, Height), GetWorldPosition(Width, Height), Color.red, 100f);
-            Debug.DrawLine(GetWorldPosition(Width, 0), GetWorldPosition(Width, Height), Color.red, 100f);
+            Debug.DrawLine(GetWorldPosition(0, Height), GetWorldPosition(Width, Height), Color.blue, 1000f);
+            Debug.DrawLine(GetWorldPosition(Width, 0), GetWorldPosition(Width, Height), Color.blue, 1000f);
         }
     }
 
@@ -120,18 +134,33 @@ public class GridXZ<TGridObject>
         GetXZ(worldPosition, out x, out z);
         return GetGridObject(x, z);
     }
-    
-    public void GetNeighbors(int x,int y ,out TGridObject Up,out TGridObject RightUp, out TGridObject Right, out TGridObject RightDown, out TGridObject Down, out TGridObject LeftDown, out TGridObject Left, out TGridObject LeftUp)
-    {
 
-        Up = GetGridObject(x, y + 1);
-        RightUp = GetGridObject(x + 1, y + 1);
-        Right = GetGridObject(x + 1, y);
-        RightDown = GetGridObject(x + 1, y - 1);
-        Down = GetGridObject(x, y - 1);
-        LeftDown = GetGridObject(x - 1, y - 1);
-        Left = GetGridObject(x - 1, y);
-        LeftUp = GetGridObject(x - 1, y + 1);
+    public List<TGridObject> GetNeighbors(int x, int y)
+    {
+        List<TGridObject> neighbors = new List<TGridObject>();
+
+        if (x - 1 >= 0)
+        {
+            //Left
+            neighbors.Add(GetGridObject(x - 1, y));
+            //LeftDown
+            if (y - 1 >= 0) neighbors.Add(GetGridObject(x - 1, y - 1));
+            //LeftUp
+            if (y + 1 < Height) neighbors.Add(GetGridObject(x - 1, y + 1));
+        }
+        if (x + 1 < Width)
+        {
+            //right
+            neighbors.Add(GetGridObject(x + 1, y));
+            //right down
+            if (y - 1 >= 0) neighbors.Add(GetGridObject(x + 1, y - 1));
+            //right up
+            if (y + 1 < Height) neighbors.Add(GetGridObject(x + 1, y + 1));
+        }
+        if (y + 1 < Height) neighbors.Add(GetGridObject(x, y + 1));
+        if (y - 1 >= 0) neighbors.Add(GetGridObject(x, y - 1));
+
+        return neighbors;
     }
 
     public Vector2Int ValidateGridPosition(Vector2Int gridPosition)

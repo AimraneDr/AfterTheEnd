@@ -16,7 +16,7 @@ public class BuildingSystem : MonoBehaviour
 
     float CellSize = 1f;
 
-    private GridXZ<GridObject> grid;
+    public GridXZ<BuildNode> grid;
 
     public Accounter AccounterObj;
 
@@ -28,7 +28,7 @@ public class BuildingSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        grid = new GridXZ<GridObject>(GridWidth, GridHeight, CellSize, Vector3.zero, (GridXZ<GridObject> g, int x, int z) => new GridObject(g, x, z));
+        grid = new GridXZ<BuildNode>(GridWidth, GridHeight, CellSize, Vector3.zero, (GridXZ<BuildNode> g, int x, int z) => new BuildNode(g, x, z));
 
         foreach(PlacableObject obj in ObjectsList)
         {
@@ -64,7 +64,7 @@ public class BuildingSystem : MonoBehaviour
                 bool canBuild = true;
                 foreach (Vector2Int grid_p in grid_positions)
                 {
-                    if (!grid.GetGridObject(grid_p.x, grid_p.y).CanBuild) { canBuild = false; break; }
+                    if (grid.GetGridObject(grid_p.x, grid_p.y).State == GridObject<BuildNode>.GridState.BookedUp) { canBuild = false; break; }
                 }
 
                 Vector2Int RotationOffset = SelectedObject.GetRotationOffset(Dir);
@@ -115,7 +115,7 @@ public class BuildingSystem : MonoBehaviour
                 bool canBuild = true;
                 foreach (Vector2Int grid_p in grid_positions)
                 {
-                    if (!grid.GetGridObject(grid_p.x, grid_p.y).CanBuild) { canBuild = false; break; }
+                    if (grid.GetGridObject(grid_p.x, grid_p.y).State == GridObject<BuildNode>.GridState.BookedUp) { canBuild = false; break; }
                 }
 
                 if (canBuild)

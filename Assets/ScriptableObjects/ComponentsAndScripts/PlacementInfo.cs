@@ -6,9 +6,9 @@ public class PlacementInfo : MonoBehaviour
 {
     private Vector2Int Origin;
     private PlacableObject.Direction Dir;
-    private List<GridObject> BookedUpPlaces;
+    private List<BuildNode> BookedUpPlaces;
 
-    public void SetProperties(Vector2Int origin, PlacableObject.Direction dir, List<GridObject> bookedUpPlaces)
+    public void SetProperties(Vector2Int origin, PlacableObject.Direction dir, List<BuildNode> bookedUpPlaces)
     {
         Origin = origin;
         Dir = dir;
@@ -18,7 +18,7 @@ public class PlacementInfo : MonoBehaviour
 
     public void DestroySelf()
     {
-        foreach (GridObject item in BookedUpPlaces)
+        foreach (BuildNode item in BookedUpPlaces)
         {
             item.ClearHoldedObject();
         }

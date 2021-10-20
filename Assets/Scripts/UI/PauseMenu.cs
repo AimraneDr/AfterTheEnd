@@ -44,7 +44,7 @@ public class PauseMenu : MonoBehaviour
         for (int i = 0; i < list.Length; i++)
         {
             GameObject obj = GameObject.Instantiate(
-                DB?.InvetorySlot,
+                DB?.InventorySlot,
                 SlotsHolder.transform,
                 false
                 );

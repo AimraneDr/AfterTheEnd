@@ -8,7 +8,7 @@ public class Accounter : MonoBehaviour
     [Header("Monny")]
     public Slider MonnySlider;
     public int MaxAmmount;
-    private int CurrentAmmount = 100;
+    public int CurrentAmmount = 1000;
 
     // Start is called before the first frame update
     void Start()

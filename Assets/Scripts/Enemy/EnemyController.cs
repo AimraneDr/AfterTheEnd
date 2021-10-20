@@ -11,6 +11,9 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         path_finder = new GridPathFinder(100, 100);
+        path_finder.BuildGridLevel = GameObject.Find("BuildingSystemObject").GetComponent<BuildingSystem>().grid;
+        path_finder.PassEvents();
+        path_finder.SetBookedUpNodes();
     }
 
     // Update is called once per frame
@@ -28,7 +31,7 @@ public class EnemyController : MonoBehaviour
             {
                 for (int i = 0; i < path.Count - 1; i++)
                 {
-                    Debug.DrawLine(new Vector3(path[i].x, 0, path[i].y) * 1f + Vector3.one * 0.5f, new Vector3(path[i + 1].x, 0, path[i + 1].y) * 1f + Vector3.one * 0.5f,Color.red,100f);
+                    Debug.DrawLine(new Vector3(path[i].x, 0, path[i].z) * 1f + Vector3.one * 0.5f, new Vector3(path[i + 1].x, 0, path[i + 1].z) * 1f + Vector3.one * 0.5f,Color.red,100f);
                 }
             }
         }

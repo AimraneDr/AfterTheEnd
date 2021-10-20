@@ -21,7 +21,28 @@ public class GridXZ<TGridObject>
     private float CellSize;
     private Vector3 OriginPosition;
     public TGridObject[,] GridArray;
+    public List<TGridObject> BookedUpGrids;
 
+    public delegate void GridXZEventsHandler(GridXZ<TGridObject> sender,TGridObject item = default(TGridObject));
+    public event GridXZEventsHandler OnBookedUpGridsChange, OnBookedUpGridsAdd, OnBookedUpGridsRemove;
+    public void RizeOnBookedUpGridsChange(GridXZ<TGridObject> grid)
+    {
+        /*Debug.Log("BookedUpGrids list changed");*/
+
+        if (OnBookedUpGridsChange != null) OnBookedUpGridsChange(grid);
+    }
+    public void RizeOnBookedUpGridsAdd(GridXZ<TGridObject> grid,TGridObject AddedItem)
+    {
+        //Debug.Log("BookedUpGrids list changed type of Add");
+
+        if (OnBookedUpGridsAdd != null) OnBookedUpGridsAdd(grid, AddedItem);
+    }
+    public void RizeOnBookedUpGridsRemove(GridXZ<TGridObject> grid,TGridObject RemovedItem)
+    {
+       //Debug.Log("BookedUpGrids list changed type of Remove");
+
+        if (OnBookedUpGridsRemove != null) OnBookedUpGridsRemove(grid, RemovedItem);
+    }
 
 
     public GridXZ(int width, int height, float cell_size, Vector3 originPosition, Func<GridXZ<TGridObject>, int, int, TGridObject> createGridObject)
@@ -31,6 +52,7 @@ public class GridXZ<TGridObject>
         CellSize = cell_size;
         OriginPosition = originPosition;
         GridArray = new TGridObject[width, height];
+        BookedUpGrids = new List<TGridObject>();
 
         for (int x = 0; x < GridArray.GetLength(0); x++)
         {
@@ -47,10 +69,16 @@ public class GridXZ<TGridObject>
             try
             {
                 PathNode node = obj as PathNode;
+                BuildNode GObj = obj as BuildNode;
                 if (node != null)
                 {
                     node.SetNeighbors();
                     //Debug.Log(node.Neighbors.Count);
+                }
+
+                if (GObj != null)
+                {
+                    GObj.SetNeighbors();
                 }
             }
             catch (Exception ex) { Debug.Log(ex.Message); }
@@ -135,30 +163,30 @@ public class GridXZ<TGridObject>
         return GetGridObject(x, z);
     }
 
-    public List<TGridObject> GetNeighbors(int x, int y)
+    public List<TGridObject> GetNeighbors(int x, int z)
     {
         List<TGridObject> neighbors = new List<TGridObject>();
 
         if (x - 1 >= 0)
         {
             //Left
-            neighbors.Add(GetGridObject(x - 1, y));
+            neighbors.Add(GetGridObject(x - 1, z));
             //LeftDown
-            if (y - 1 >= 0) neighbors.Add(GetGridObject(x - 1, y - 1));
+            if (z - 1 >= 0) neighbors.Add(GetGridObject(x - 1, z - 1));
             //LeftUp
-            if (y + 1 < Height) neighbors.Add(GetGridObject(x - 1, y + 1));
+            if (z + 1 < Height) neighbors.Add(GetGridObject(x - 1, z + 1));
         }
         if (x + 1 < Width)
         {
             //right
-            neighbors.Add(GetGridObject(x + 1, y));
+            neighbors.Add(GetGridObject(x + 1, z));
             //right down
-            if (y - 1 >= 0) neighbors.Add(GetGridObject(x + 1, y - 1));
+            if (z - 1 >= 0) neighbors.Add(GetGridObject(x + 1, z - 1));
             //right up
-            if (y + 1 < Height) neighbors.Add(GetGridObject(x + 1, y + 1));
+            if (z + 1 < Height) neighbors.Add(GetGridObject(x + 1, z + 1));
         }
-        if (y + 1 < Height) neighbors.Add(GetGridObject(x, y + 1));
-        if (y - 1 >= 0) neighbors.Add(GetGridObject(x, y - 1));
+        if (z + 1 < Height) neighbors.Add(GetGridObject(x, z + 1));
+        if (z - 1 >= 0) neighbors.Add(GetGridObject(x, z - 1));
 
         return neighbors;
     }

@@ -6,7 +6,7 @@ public class ItemsDataBase : MonoBehaviour
 {
     [Header("Objects")]
     public PlacableObject[] PlacableObjects;
-    public GameObject InvetorySlot;
+    public GameObject InventorySlot;
 
     [Header("Sprites")]
     [Space(30)]

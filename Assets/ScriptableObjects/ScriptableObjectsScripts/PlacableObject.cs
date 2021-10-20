@@ -12,8 +12,8 @@ public class PlacableObject : Item
     public int Cost;
 
     private Vector2Int Origin;
-    private List<GridObject> BookedUpPlaces;
-    private GridXZ<GridObject> GridReference;
+    private List<BuildNode> BookedUpPlaces;
+    private GridXZ<BuildNode> GridReference;
 
 
     public enum Direction { Forward, right, Back, Left, }
@@ -22,7 +22,7 @@ public class PlacableObject : Item
     {
         ItemType = Type.PickableOnly;
     }
-    public void SetGridRef(GridXZ<GridObject> GridRef)
+    public void SetGridRef(GridXZ<BuildNode> GridRef)
     {
         GridReference = GridRef;
     }
@@ -43,9 +43,9 @@ public class PlacableObject : Item
         FinalObj = obj;
     }
 
-    public List<GridObject> BookUpGridPlaces(Vector2Int offset, Direction dir)
+    public List<BuildNode> BookUpGridPlaces(Vector2Int offset, Direction dir)
     {
-        List<GridObject> positions = new List<GridObject>();
+        List<BuildNode> positions = new List<BuildNode>();
         switch (dir)
         {
             case Direction.Forward:
@@ -74,7 +74,7 @@ public class PlacableObject : Item
 
         return positions;
     }
-    public List<GridObject> GetBookedUpPlacesList()
+    public List<BuildNode> GetBookedUpPlacesList()
     {
         return BookedUpPlaces;
     }

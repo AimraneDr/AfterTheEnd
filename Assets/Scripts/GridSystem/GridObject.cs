@@ -1,41 +1,33 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridObject
+public class GridObject<T> 
 {
-    private GridXZ<GridObject> grid;
-    private int x, z;
-    private GameObject HoldedObject;
-    public bool CanBuild { get { return HoldedObject == null; } }
+    public GridXZ<T> grid;
+    public int x, z;
+    public List<T> Neighbors;
+    public GridState State = GridState.Free;
+   
 
-    public GridObject(GridXZ<GridObject> _grid, int _x, int _z)
+    public enum GridState
     {
-        grid = _grid;
-        x = _x;
-        z = _z;
+        Free,
+        BookedUp
     }
-
-    public void SetHoldedObject(GameObject obj)
+    public void SetNeighbors()
     {
-        HoldedObject= obj;
-    }
-    public GameObject GetHoldedObject()
-    {
-        return HoldedObject;
+        Neighbors = grid.GetNeighbors(x, z);
     }
 
-    public void ClearHoldedObject()
-    {
-        HoldedObject = null;
-    }
     public Vector2Int GetPosition()
     {
         return new Vector2Int(x, z);
     }
+
     public override string ToString()
     {
         return $"{x} , {z}";
     }
-    
+
 }

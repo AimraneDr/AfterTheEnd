@@ -226,7 +226,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 95779854}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 28.5, y: 0.5, z: 63.5}
+  m_LocalPosition: {x: 99.5, y: 0.5, z: 99.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 837079657}
@@ -724,7 +724,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 627569630}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 0, z: 50}
+  m_LocalPosition: {x: 16.1, y: 0, z: 10.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1687258585}
@@ -1253,7 +1253,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c7207ede9198b37418980c1599cf1999, type: 2}
   - {fileID: 11400000, guid: f5f63fe6aa16603439fc210574a4578a, type: 2}
   - {fileID: 11400000, guid: 11bfa9fd291ca91469db2c9c7945e3c9, type: 2}
-  InvetorySlot: {fileID: 2560094217714667377, guid: c2ea9e3d0cc70fd48b9f379c26f9e57e, type: 3}
+  InventorySlot: {fileID: 2560094217714667377, guid: c2ea9e3d0cc70fd48b9f379c26f9e57e, type: 3}
   sprite: {fileID: 0}
 --- !u!4 &1146044850
 Transform:
@@ -1471,7 +1471,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MonnySlider: {fileID: 1975138297}
-  MaxAmmount: 1000
+  MaxAmmount: 100000
+  CurrentAmmount: 1000
 --- !u!4 &1460138639
 Transform:
   m_ObjectHideFlags: 0
@@ -1836,8 +1837,8 @@ Camera:
   m_GameObject: {fileID: 1687258581}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.2113741, g: 0.7075472, b: 0.64519954, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

@@ -7,7 +7,7 @@ public class BuildingSystem : MonoBehaviour
     public LayerMask MoseColliderLayerMask;
     public List<PlacableObject> ObjectsList;
     
-    public PlacableObject SelectedObject;
+    public PlacableObject SelectedObject,DefaultObject;
 
     private PlacableObject.Direction Dir;
 
@@ -25,15 +25,26 @@ public class BuildingSystem : MonoBehaviour
     GameObject temporraryObj = null;
     int temporraryId = 0;
 
+    public static BuildingSystem Instance;
+
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;
         grid = new GridXZ<BuildNode>(GridWidth, GridHeight, CellSize, Vector3.zero, (GridXZ<BuildNode> g, int x, int z) => new BuildNode(g, x, z));
 
         foreach(PlacableObject obj in ObjectsList)
         {
             obj.SetGridRef(grid);
         }
+
+
+
+        //test
+
+        new LevelDesigner(grid, ObjectsList[0]);
+
+
     }
 
     // Update is called once per frame
@@ -41,10 +52,14 @@ public class BuildingSystem : MonoBehaviour
     {
         if (!Administration.Game.GameIsStoped())
         {
+            PlacableObject.Direction dir = Dir;
+            RotationInputsListner();
+            if (dir != Dir) temporraryObjIsCreated = false;
             TemporraryVisual();
             if (SelectedObject != null)
             {
-                IputsHandler();
+                
+                InputsHandler();
             }
                 
         }
@@ -94,13 +109,32 @@ public class BuildingSystem : MonoBehaviour
         }
         else
         {
+            Destroy(temporraryObj);
             temporraryObj = null;
         }
     }
 
+    void RotationInputsListner()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Dir = PlacableObject.Direction.Forward;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Dir = PlacableObject.Direction.right;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Dir = PlacableObject.Direction.Back;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Dir = PlacableObject.Direction.Left;
+        }
+    }
 
-
-    void IputsHandler()
+    void InputsHandler()
     {
         float MaxHoldTime = 0.5f, HoldTime = 0;
         if (Input.GetMouseButtonDown(1))
@@ -145,6 +179,8 @@ public class BuildingSystem : MonoBehaviour
         {
             HoldTime = 0;
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) SelectedObject = null;
     }
 
 

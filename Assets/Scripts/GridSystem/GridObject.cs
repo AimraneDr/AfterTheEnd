@@ -8,8 +8,17 @@ public class GridObject<T>
     public int x, z;
     public List<T> Neighbors;
     public GridState State = GridState.Free;
-   
 
+    public T
+        UpNeighbor,
+        UpRightNeighbor,
+        RightNeighbor,
+        RightDownNeighbor,
+        DownNeighbor,
+        LeftDownNeighbor,
+        LeftNeighbor,
+        LeftUpNeighbor
+        ;
     public enum GridState
     {
         Free,
@@ -17,7 +26,16 @@ public class GridObject<T>
     }
     public void SetNeighbors()
     {
-        Neighbors = grid.GetNeighbors(x, z);
+        Neighbors = grid.GetNeighbors(x, z,
+            out UpNeighbor,
+            out UpRightNeighbor,
+            out RightNeighbor,
+            out RightDownNeighbor,
+            out DownNeighbor,
+            out LeftDownNeighbor,
+            out LeftNeighbor,
+            out LeftUpNeighbor
+            );
     }
 
     public Vector2Int GetPosition()

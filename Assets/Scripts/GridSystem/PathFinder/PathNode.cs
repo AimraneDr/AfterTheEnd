@@ -13,18 +13,6 @@ public class PathNode : GridObject<PathNode>, IHeapItem<PathNode>
         get { return State == GridState.Free; }
     }
 
-    ////neighbors
-    //private static PathNode 
-    //    UpNeighbor = null, 
-    //    UpRightNeighbor = null,
-    //    RightNeighbor = null,
-    //    RightDownNeighbor = null,
-    //    DownNeighbor = null,
-    //    LeftDownNeighbor = null,
-    //    LeftNeighbor = null, 
-    //    LeftUpNeighbor = null
-    //    ;
-
     private int heapIndex;
     public int HeapIndex
     {

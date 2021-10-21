@@ -5,19 +5,9 @@ public class Heap<T> where T : IHeapItem<T>
 {
     T[] items;
     int CurrentItemsCount;
-    public int Count
-    {
-        get => CurrentItemsCount;
-    }
-    public Heap(int maxItemsCount)
-    {
-        items = new T[maxItemsCount];
-    }
-
-    public bool Contains(T item)
-    {
-        return Equals(items[item.HeapIndex], item);
-    }
+    public int Count {  get => CurrentItemsCount; }
+    public Heap(int maxItemsCount) { items = new T[maxItemsCount]; }
+    public bool Contains(T item) { return Equals(items[item.HeapIndex], item); }
     public void Add(T item)
     {
         item.HeapIndex = CurrentItemsCount;
@@ -34,10 +24,7 @@ public class Heap<T> where T : IHeapItem<T>
         SortDown(items[0]);
         return first_item;
     }
-    public void UbdateItem(T item)
-    {
-        SortUp(item);
-    }
+    public void UbdateItem(T item) { SortUp(item); }
     void SortDown(T item)
     {
         while (true)
@@ -49,7 +36,6 @@ public class Heap<T> where T : IHeapItem<T>
             if (child_index_left < CurrentItemsCount)
             {
                 swap_index = child_index_left;
-
                 if (child_index_right < CurrentItemsCount)
                 {
                     if (items[child_index_left].CompareTo(items[child_index_right]) < 0)
@@ -57,7 +43,6 @@ public class Heap<T> where T : IHeapItem<T>
                         swap_index = child_index_right;
                     }
                 }
-
                 if (item.CompareTo(items[swap_index]) < 0)
                 {
                     Swap(item, items[swap_index]);
@@ -78,11 +63,9 @@ public class Heap<T> where T : IHeapItem<T>
                 Swap(item, parent_item);
             }
             else break;
-
             parent_index = (item.HeapIndex - 1) / 2;
         }
     }
-
     void Swap(T a,T b)
     {
         items[a.HeapIndex] = b;
@@ -92,4 +75,3 @@ public class Heap<T> where T : IHeapItem<T>
         b.HeapIndex = item_a_index;
     }
 }
-

@@ -191,6 +191,60 @@ public class GridXZ<TGridObject>
         return neighbors;
     }
 
+    public List<TGridObject> GetNeighbors(int x, int z, out TGridObject Up, out TGridObject UpRight, out TGridObject Right, out TGridObject BottomRight, out TGridObject Bottom, out TGridObject BottomLeft, out TGridObject Left, out TGridObject UpLeft)
+    {
+        List<TGridObject> neighbors = new List<TGridObject>();
+        Up = UpRight = UpLeft = Bottom = BottomRight = BottomLeft = Right = Left = default(TGridObject);
+        if (x - 1 >= 0)
+        {
+            //Left
+            Left = GetGridObject(x - 1, z);
+            neighbors.Add(Left);
+            //LeftDown
+            if (z - 1 >= 0)
+            {
+                BottomLeft = GetGridObject(x - 1, z - 1);
+                neighbors.Add(BottomLeft);
+            }
+            //LeftUp
+            if (z + 1 < Height)
+            {
+                UpLeft = GetGridObject(x - 1, z + 1);
+                neighbors.Add(UpLeft);
+            }
+        }
+        if (x + 1 < Width)
+        {
+            //right
+            Right = GetGridObject(x + 1, z);
+            neighbors.Add(Right);
+            //right down
+            if (z - 1 >= 0)
+            {
+                UpRight = GetGridObject(x + 1, z - 1);
+                neighbors.Add(UpRight);
+            }
+            //right up
+            if (z + 1 < Height)
+            {
+                BottomRight = GetGridObject(x + 1, z + 1);
+                neighbors.Add(BottomRight);
+            }
+        }
+        if (z + 1 < Height)
+        {
+            Up = GetGridObject(x, z + 1);
+            neighbors.Add(Up);
+        }
+        if (z - 1 >= 0)
+        {
+            Bottom = GetGridObject(x, z - 1);
+            neighbors.Add(Bottom);
+        }
+
+        return neighbors;
+    }
+
     public Vector2Int ValidateGridPosition(Vector2Int gridPosition)
     {
         return new Vector2Int(

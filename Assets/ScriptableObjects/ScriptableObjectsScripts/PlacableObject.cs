@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "EmptyTemplate", menuName = "Buildable Objects/EmptyTemplate")]
-public class PlacableObject : Item
+public class PlacableObject : Item ,IDamageable
 {
+    public int Health;
     public int Width, Length, Height;
-    [HideInInspector]
-    public MeshRenderer Mesh_Renderer;
+
 
     public int Cost;
 
     private Vector2Int Origin;
-    private List<BuildNode> BookedUpPlaces;
     private GridXZ<BuildNode> GridReference;
 
 
@@ -73,10 +72,6 @@ public class PlacableObject : Item
         }
 
         return positions;
-    }
-    public List<BuildNode> GetBookedUpPlacesList()
-    {
-        return BookedUpPlaces;
     }
 
     public List<Vector2Int> GetImaginaryBookedUpPlacesList(Vector2Int offset, Direction dir)
@@ -141,6 +136,11 @@ public class PlacableObject : Item
             case Direction.right: return new Vector2Int(Height, 0);
         }
         return new Vector2Int(0, 0);
+    }
+
+    public void Damage(int damage)
+    {
+        Health -= damage;
     }
 
 }

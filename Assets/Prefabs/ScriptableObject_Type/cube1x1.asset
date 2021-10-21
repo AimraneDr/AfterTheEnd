@@ -17,6 +17,8 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: c1d34f13c86b5fd44adf35563f0ef7b1, type: 3}
   Graphics: {fileID: 2246172806553625110, guid: 563fac1ca96073840b72f6ed96e122f1, type: 3}
   ItemType: 2
+  tag: 0
+  Health: 10
   Width: 1
   Length: 1
   Height: 1

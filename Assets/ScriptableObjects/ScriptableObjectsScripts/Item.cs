@@ -11,11 +11,18 @@ public class Item : ScriptableObject
     public Sprite Icon;
     public GameObject Graphics;
     public Type ItemType;
+    public Tag tag;
     public enum Type
     {
         PlacableOnly,
         PlacableAndPickable,
         PickableOnly,
 
+    }
+
+    public enum Tag
+    {
+        DeffenceWall,
+        LiveHouse
     }
 }

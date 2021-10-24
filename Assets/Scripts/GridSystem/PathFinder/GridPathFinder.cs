@@ -46,13 +46,17 @@ public class GridPathFinder
             grid.BookedUpGrids.Add(node);
         }
     }
-    public List<PathNode> FindPath(int start_x, int start_y, int end_x, int end_y)
+    /// <summary>
+    /// find the clean and the fastiest path to reach the destination
+    /// </summary>
+    /// <returns></returns>
+    public List<PathNode> FindCleanPath(int start_x, int start_z, int target_x, int target_z)
     {
         //UnityEngine.Debug.Log("Start fint Path nodes");
         sw = new Stopwatch();
         sw.Start();
-        PathNode startNode = grid.GetGridObject(start_x, start_y);
-        PathNode endNode = grid.GetGridObject(end_x, end_y);
+        PathNode startNode = grid.GetGridObject(start_x, start_z);
+        PathNode endNode = grid.GetGridObject(target_x, target_z);
         OpenNodes = new Heap<PathNode>(MaxSize);
         ClosedNodes = new Heap<PathNode>(MaxSize);
         OpenNodes.Add(startNode);
@@ -83,26 +87,52 @@ public class GridPathFinder
             ClosedNodes.Add(CurrentNode);
 
             CheckNeighbors(CurrentNode, endNode);
-            //foreach (PathNode neighbor in CurrentNode.Neighbors)
-            //{
-            //    if (ClosedNodes.Contains(neighbor)) continue;
-            //    if (!neighbor.IsWalkable)
-            //    {
-            //        ClosedNodes.Add(neighbor);
-            //        continue;
-            //    }
 
-            //    int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, neighbor);
-            //    if (tentativeGCost < neighbor.G_Cost)
-            //    {
-            //        neighbor.CameFromNode = CurrentNode;
-            //        neighbor.G_Cost = tentativeGCost;
-            //        neighbor.H_Cost = Calculat_distance_cost(neighbor, endNode);
-            //        neighbor.CalculateFCost();
+        }
+        return null;
+    }
 
-            //        if (!OpenNodes.Contains(neighbor)) OpenNodes.Add(neighbor);
-            //    }
-            //}
+    /// <summary>
+    /// find the fastiest path to reach the destination without taking barriers into count
+    /// </summary>
+    /// <returns></returns>
+    public List<PathNode> FindThroughBarriersPath(int start_x, int start_z, int target_x, int target_z)
+    {
+        //UnityEngine.Debug.Log("start finding Through Barriers Path");
+        sw = new Stopwatch();
+        sw.Start();
+        PathNode startNode = grid.GetGridObject(start_x, start_z);
+        PathNode endNode = grid.GetGridObject(target_x, target_z);
+        OpenNodes = new Heap<PathNode>(MaxSize);
+        ClosedNodes = new Heap<PathNode>(MaxSize);
+        OpenNodes.Add(startNode);
+
+        for (int x = 0; x < grid.GetWidth(); x++)
+        {
+            for (int y = 0; y < grid.GetHeight(); y++)
+            {
+                PathNode node = grid.GetGridObject(x, y);
+                node.G_Cost = int.MaxValue;
+                node.CalculateFCost();
+                node.CameFromNode = null;
+            }
+        }
+
+        startNode.G_Cost = 0;
+        startNode.H_Cost = Calculat_distance_cost(startNode, endNode);
+        startNode.CalculateFCost();
+
+        while (OpenNodes.Count > 0)
+        {
+            PathNode CurrentNode = OpenNodes.RemoveFirst();
+            if (CurrentNode == endNode)
+            {
+                return CalculatePath(endNode);
+            }
+
+            ClosedNodes.Add(CurrentNode);
+
+            CheckNeighbors(CurrentNode, endNode ,true);
 
         }
         return null;
@@ -111,18 +141,34 @@ public class GridPathFinder
     public List<Vector3> FindPath(Vector3 StartWorldPosition,Vector3 TargetWorldPosition)
     {
         //UnityEngine.Debug.Log("Start fint Path positions");
+        var sw = new Stopwatch();
+        sw.Start();
         grid.GetXZ(StartWorldPosition, out int s_x, out int s_y);
         grid.GetXZ(TargetWorldPosition, out int x, out int y);
-        List<PathNode> path = FindPath(s_x, s_y, x, y);
+        List<PathNode> path = FindCleanPath(s_x, s_y, x, y);
         if (path == null)
         {
-            //UnityEngine.Debug.Log("Path Not found");
-            return null;
+            path = FindThroughBarriersPath(s_x, s_y, x, y);
+
+            if (path == null) { 
+                sw.Stop();
+                UnityEngine.Debug.Log($"path fount after : {sw.ElapsedMilliseconds} ms");
+                return null; 
+            }
+            else 
+            {
+                var _ = new List<Vector3>(PathToWorldPostions(path.ToArray()));
+                sw.Stop();
+                UnityEngine.Debug.Log($"path fount after : {sw.ElapsedMilliseconds} ms");
+                return _;
+            }
         }
         else
         {
-            //UnityEngine.Debug.Log("Path positions had been found");
-            return new List<Vector3>(PathToWorldPostions(path.ToArray()));
+            var _ = new List<Vector3>(PathToWorldPostions(path.ToArray()));
+            sw.Stop();
+            UnityEngine.Debug.Log($"path fount after : {sw.ElapsedMilliseconds} ms");
+            return _;
         }
            
     }
@@ -163,6 +209,13 @@ public class GridPathFinder
         }
         return simplifiedPath.ToArray();
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path">an array of waypoints</param>
+    /// <param name="keep_waypoints_of_index">represents wich waypoint of path[] needs to be keeped </param>
+    /// <returns>simplified virsion of the input path empty of inligned waypoints</returns>
     public Vector3[] SimplifyPath(Vector3[] path)
     {
         if (path != null)
@@ -174,7 +227,6 @@ public class GridPathFinder
             {
                 Vector2 direction = new Vector2(path[i - 1].x - path[i].x, path[i - 1].z - path[i].z);
                 if (direction != OldPoint) simplifiedPath.Add(path[i - 1]);
-
                 OldPoint = direction;
             }
             simplifiedPath.Add(path[path.Length - 1]);
@@ -217,7 +269,7 @@ public class GridPathFinder
             grid.BookedUpGrids.Remove(node);
     }
 
-    private void CheckNeighbor(PathNode currentNode, PathNode neighbor, PathNode endNode)
+    private void CheckNeighbor(PathNode currentNode, PathNode neighbor, PathNode endNode,bool ConsiderBarriers = false)
     {
         if (!ClosedNodes.Contains(neighbor))
         {
@@ -225,9 +277,41 @@ public class GridPathFinder
             {
                 ClosedNodes.Add(neighbor);
 
+                if (!ConsiderBarriers)
+                {
+                    ClosedNodes.Add(neighbor);
+                }
+                else
+                {
+                    Item.Spicialities HoldedObjectSpiciality = Item.Spicialities.None;
+                    if (BuildGridLevel.GetGridObject(neighbor.x, neighbor.z).GetHoldedObject() != null)
+                    {
+                        HoldedObjectSpiciality = BuildGridLevel.GetGridObject(neighbor.x, neighbor.z).GetHoldedObject().GetComponent<ObjectInfo>().Spisiality;
+                    }
+                    UnityEngine.Debug.Log($"{HoldedObjectSpiciality}");
+                    if (HoldedObjectSpiciality == Item.Spicialities.Deffance)
+                    {
+                        UnityEngine.Debug.Log("Grid Holds a deffance Object");
+                        int tentativeGCost = currentNode.G_Cost + Calculat_distance_cost(currentNode, neighbor);
+                        if (tentativeGCost < neighbor.G_Cost)
+                        {
+                            neighbor.CameFromNode = currentNode;
+                            neighbor.G_Cost = tentativeGCost;
+                            neighbor.H_Cost = Calculat_distance_cost(neighbor, endNode);
+                            neighbor.CalculateFCost();
+
+                            if (!OpenNodes.Contains(neighbor)) OpenNodes.Add(neighbor);
+                        }
+                    }
+                    else
+                    {
+                        ClosedNodes.Add(neighbor);
+                    }
+                }
             }
             else
             {
+                
                 int tentativeGCost = currentNode.G_Cost + Calculat_distance_cost(currentNode, neighbor);
                 if (tentativeGCost < neighbor.G_Cost)
                 {
@@ -241,7 +325,7 @@ public class GridPathFinder
             }
         }
     }
-    private void CheckNeighbors(PathNode CurrentNode,PathNode endNode)
+    private void CheckNeighbors(PathNode CurrentNode,PathNode endNode,bool ConsiderBarriers = false)
     {
         bool UpIsValid = false,
             RightIsValid = false,
@@ -254,21 +338,36 @@ public class GridPathFinder
             {
                 if (!CurrentNode.RightNeighbor.IsWalkable)
                 {
-                    ClosedNodes.Add(CurrentNode.RightNeighbor);
-                    RightIsValid = false;
+                    if (!ConsiderBarriers)
+                    {
+                        ClosedNodes.Add(CurrentNode.RightNeighbor);
+                        RightIsValid = false;
+                    }
+                    else
+                    {
+                        Item.Spicialities HoldedObjectSpiciality = Item.Spicialities.None;
+                        if(BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject() != null)
+                        {
+                            HoldedObjectSpiciality = BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject().GetComponent<ObjectInfo>().Spisiality;
+                        }
+                        UnityEngine.Debug.Log($"{HoldedObjectSpiciality}");
+                        if (HoldedObjectSpiciality == Item.Spicialities.Deffance)
+                        {
+                            UnityEngine.Debug.Log("Grid Holds a deffance Object");
+                            Check(CurrentNode.RightNeighbor);
+                            RightIsValid = false;
+                        }
+                        else
+                        {
+                            ClosedNodes.Add(CurrentNode.RightNeighbor);
+                            RightIsValid = false;
+                        }
+                    }
+                   
                 }
                 else
                 {
-                    int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, CurrentNode.RightNeighbor);
-                    if (tentativeGCost < CurrentNode.RightNeighbor.G_Cost)
-                    {
-                        CurrentNode.RightNeighbor.CameFromNode = CurrentNode;
-                        CurrentNode.RightNeighbor.G_Cost = tentativeGCost;
-                        CurrentNode.RightNeighbor.H_Cost = Calculat_distance_cost(CurrentNode.RightNeighbor, endNode);
-                        CurrentNode.RightNeighbor.CalculateFCost();
-
-                        if (!OpenNodes.Contains(CurrentNode.RightNeighbor)) OpenNodes.Add(CurrentNode.RightNeighbor);
-                    }
+                    Check(CurrentNode.RightNeighbor);
                     RightIsValid = true;
                 }
             }
@@ -279,21 +378,35 @@ public class GridPathFinder
             {
                 if (!CurrentNode.LeftNeighbor.IsWalkable)
                 {
-                    ClosedNodes.Add(CurrentNode.LeftNeighbor);
-                    LeftIsValid = false;
+                    if (!ConsiderBarriers)
+                    {
+                        ClosedNodes.Add(CurrentNode.LeftNeighbor);
+                        LeftIsValid = false;
+                    }
+                    else
+                    {
+                        Item.Spicialities HoldedObjectSpiciality = Item.Spicialities.None;
+                        if (BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject() != null)
+                        {
+                            HoldedObjectSpiciality = BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject().GetComponent<ObjectInfo>().Spisiality;
+                        }
+                        UnityEngine.Debug.Log($"{HoldedObjectSpiciality}");
+                        if (HoldedObjectSpiciality == Item.Spicialities.Deffance)
+                        {
+                            UnityEngine.Debug.Log("Grid Holds a deffance Object");
+                            Check(CurrentNode.LeftNeighbor);
+                            LeftIsValid = false;
+                        }
+                        else
+                        {
+                            ClosedNodes.Add(CurrentNode.LeftNeighbor);
+                            LeftIsValid = false;
+                        }
+                    }
                 }
                 else
                 {
-                    int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, CurrentNode.LeftNeighbor);
-                    if (tentativeGCost < CurrentNode.LeftNeighbor.G_Cost)
-                    {
-                        CurrentNode.LeftNeighbor.CameFromNode = CurrentNode;
-                        CurrentNode.LeftNeighbor.G_Cost = tentativeGCost;
-                        CurrentNode.LeftNeighbor.H_Cost = Calculat_distance_cost(CurrentNode.LeftNeighbor, endNode);
-                        CurrentNode.LeftNeighbor.CalculateFCost();
-
-                        if (!OpenNodes.Contains(CurrentNode.LeftNeighbor)) OpenNodes.Add(CurrentNode.LeftNeighbor);
-                    }
+                    Check(CurrentNode.LeftNeighbor);
                     LeftIsValid = true;
                 }
             }
@@ -304,21 +417,35 @@ public class GridPathFinder
             {
                 if (!CurrentNode.UpNeighbor.IsWalkable)
                 {
-                    ClosedNodes.Add(CurrentNode.UpNeighbor);
-                    UpIsValid = false;
+                    if (!ConsiderBarriers)
+                    {
+                        ClosedNodes.Add(CurrentNode.UpNeighbor);
+                        UpIsValid = false;
+                    }
+                    else
+                    {
+                        Item.Spicialities HoldedObjectSpiciality = Item.Spicialities.None;
+                        if (BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject() != null)
+                        {
+                            HoldedObjectSpiciality = BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject().GetComponent<ObjectInfo>().Spisiality;
+                        }
+                        UnityEngine.Debug.Log($"{HoldedObjectSpiciality}");
+                        if (HoldedObjectSpiciality == Item.Spicialities.Deffance)
+                        {
+                            UnityEngine.Debug.Log("Grid Holds a deffance Object");
+                            Check(CurrentNode.UpNeighbor);
+                            UpIsValid = false;
+                        }
+                        else
+                        {
+                            ClosedNodes.Add(CurrentNode.UpNeighbor);
+                            UpIsValid = false;
+                        }
+                    }
                 }
                 else
                 {
-                    int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, CurrentNode.UpNeighbor);
-                    if (tentativeGCost < CurrentNode.UpNeighbor.G_Cost)
-                    {
-                        CurrentNode.UpNeighbor.CameFromNode = CurrentNode;
-                        CurrentNode.UpNeighbor.G_Cost = tentativeGCost;
-                        CurrentNode.UpNeighbor.H_Cost = Calculat_distance_cost(CurrentNode.UpNeighbor, endNode);
-                        CurrentNode.UpNeighbor.CalculateFCost();
-
-                        if (!OpenNodes.Contains(CurrentNode.UpNeighbor)) OpenNodes.Add(CurrentNode.UpNeighbor);
-                    }
+                    Check(CurrentNode.UpNeighbor);
                     UpIsValid = true;
                 }
             }
@@ -329,22 +456,35 @@ public class GridPathFinder
             {
                 if (!CurrentNode.DownNeighbor.IsWalkable)
                 {
-                    ClosedNodes.Add(CurrentNode.DownNeighbor);
-
-                    DownIsValid = false;
+                    if (!ConsiderBarriers)
+                    {
+                        ClosedNodes.Add(CurrentNode.DownNeighbor);
+                        DownIsValid = false;
+                    }
+                    else
+                    {
+                        Item.Spicialities HoldedObjectSpiciality = Item.Spicialities.None;
+                        if (BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject() != null)
+                        {
+                            HoldedObjectSpiciality = BuildGridLevel.GetGridObject(CurrentNode.RightNeighbor.x, CurrentNode.RightNeighbor.z).GetHoldedObject().GetComponent<ObjectInfo>().Spisiality;
+                        }
+                        UnityEngine.Debug.Log($"{HoldedObjectSpiciality}");
+                        if (HoldedObjectSpiciality == Item.Spicialities.Deffance)
+                        {
+                            UnityEngine.Debug.Log("Grid Holds a deffance Object");
+                            Check(CurrentNode.DownNeighbor);
+                            DownIsValid = false;
+                        }
+                        else
+                        {
+                            ClosedNodes.Add(CurrentNode.DownNeighbor);
+                            DownIsValid = false;
+                        }
+                    }
                 }
                 else
                 {
-                    int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, CurrentNode.DownNeighbor);
-                    if (tentativeGCost < CurrentNode.DownNeighbor.G_Cost)
-                    {
-                        CurrentNode.DownNeighbor.CameFromNode = CurrentNode;
-                        CurrentNode.DownNeighbor.G_Cost = tentativeGCost;
-                        CurrentNode.DownNeighbor.H_Cost = Calculat_distance_cost(CurrentNode.DownNeighbor, endNode);
-                        CurrentNode.DownNeighbor.CalculateFCost();
-
-                        if (!OpenNodes.Contains(CurrentNode.DownNeighbor)) OpenNodes.Add(CurrentNode.DownNeighbor);
-                    }
+                    Check(CurrentNode.DownNeighbor);
                     DownIsValid = true;
                 }
             }
@@ -353,22 +493,34 @@ public class GridPathFinder
 
         if (UpIsValid && RightIsValid)
         {
-            if (CurrentNode.UpRightNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.UpRightNeighbor, endNode);
+            if (CurrentNode.UpRightNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.UpRightNeighbor, endNode, ConsiderBarriers);
         }
         if (UpIsValid && LeftIsValid)
         {
-            if (CurrentNode.LeftUpNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.LeftUpNeighbor, endNode);
+            if (CurrentNode.LeftUpNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.LeftUpNeighbor, endNode, ConsiderBarriers);
         }
         if (DownIsValid && RightIsValid)
         {
-            if (CurrentNode.RightDownNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.RightDownNeighbor, endNode);
+            if (CurrentNode.RightDownNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.RightDownNeighbor, endNode, ConsiderBarriers);
         }
         if (DownIsValid && LeftIsValid)
         {
-            if (CurrentNode.LeftDownNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.LeftDownNeighbor, endNode);
+            if (CurrentNode.LeftDownNeighbor != null) CheckNeighbor(CurrentNode, CurrentNode.LeftDownNeighbor, endNode, ConsiderBarriers);
         }
 
+        void Check(PathNode checkNode)
+        {
+            int tentativeGCost = CurrentNode.G_Cost + Calculat_distance_cost(CurrentNode, checkNode);
+            if (tentativeGCost < checkNode.G_Cost)
+            {
+                checkNode.CameFromNode = CurrentNode;
+                checkNode.G_Cost = tentativeGCost;
+                checkNode.H_Cost = Calculat_distance_cost(checkNode, endNode);
+                checkNode.CalculateFCost();
 
+                if (!OpenNodes.Contains(checkNode)) OpenNodes.Add(checkNode);
+            }
+        }
         
     }
 }

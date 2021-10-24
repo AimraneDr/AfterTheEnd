@@ -42,7 +42,7 @@ public class BuildingSystem : MonoBehaviour
 
         //test
 
-        new LevelDesigner(grid, ObjectsList[0]);
+        //new LevelDesigner(grid, ObjectsList[0]);
 
 
     }
@@ -63,6 +63,8 @@ public class BuildingSystem : MonoBehaviour
             }
                 
         }
+
+
     }
 
     void TemporraryVisual()
@@ -137,7 +139,7 @@ public class BuildingSystem : MonoBehaviour
     void InputsHandler()
     {
         float MaxHoldTime = 0.5f, HoldTime = 0;
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) || Input.GetKey(KeyCode.Return))
         {
             Vector3 spawn_position = GetMouseWorldPosition();
             if (spawn_position.x <= grid.GetWidth() && spawn_position.z <= grid.GetHeight())

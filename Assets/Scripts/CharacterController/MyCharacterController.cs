@@ -7,10 +7,12 @@ public class MyCharacterController : MonoBehaviour
     GridPathFinder path_finder;
     public bool ShowPathGizmos,UseSimplifiedPath;
     public float Speed = 5f;
+    public bool ChaseTarget = false;
     int currentWayPointIndex = 0;
+    Transform Target;
     Vector3[] path,SimplifiedPath;
-    Vector3 TargetPosition;
-
+    Vector3 TargetPosition, LastTargetPosition;
+    
 
     private void Awake()
     {
@@ -23,10 +25,17 @@ public class MyCharacterController : MonoBehaviour
     private void Update()
     {
         DrawPathGizmos();
-        MovementHandler();
-
+        if (ChaseTarget)
+        {
+            if (Target != null) 
+                if (LastTargetPosition != Target.position) 
+                    FindPath(1);
+        }
+        Move();
+        if (Target != null) LastTargetPosition = Target.position;
+        
     }
-    private void MovementHandler()
+    private void Move()
     {
         if (UseSimplifiedPath)
         {
@@ -34,9 +43,10 @@ public class MyCharacterController : MonoBehaviour
             {
 
                 Vector3 target = SimplifiedPath[currentWayPointIndex];
-                if (Vector3.Distance(transform.position, target) > .5f)
+                if (Vector3.Distance(transform.position, target) > 1f)
                 {
                     Vector3 moveDir = (target - transform.position).normalized;
+                    //transform.position = transform.position + moveDir * Speed * Time.deltaTime;
                     transform.position = Vector3.Lerp(transform.position, transform.position + moveDir, Speed * Time.deltaTime);
                 }
                 else
@@ -44,6 +54,7 @@ public class MyCharacterController : MonoBehaviour
                     currentWayPointIndex++;
                     if (currentWayPointIndex >= SimplifiedPath.Length)
                     {
+                        transform.position = Vector3.Lerp(transform.position, target, Speed * Time.deltaTime);
                         StopMoving();
                     }
                 }
@@ -58,13 +69,15 @@ public class MyCharacterController : MonoBehaviour
                 if (Vector3.Distance(transform.position, target) > 1f)
                 {
                     Vector3 moveDir = (target - transform.position).normalized;
-                    transform.position = Vector3.Lerp(transform.position, transform.position + moveDir, Speed * Time.deltaTime);
+                    //transform.position = transform.position + moveDir * Speed * Time.deltaTime;
+                    transform.position = Vector3.Lerp(transform.position, target, Speed * Time.deltaTime);
                 }
                 else
                 {
                     currentWayPointIndex++;
                     if (currentWayPointIndex >= path.Length)
                     {
+                        transform.position = Vector3.Lerp(transform.position, target, Speed * Time.deltaTime);
                         StopMoving();
                     }
                 }
@@ -72,19 +85,38 @@ public class MyCharacterController : MonoBehaviour
         }
             
     }
-    void FindPath()
+    void FindPath(int StopBefore = 0)
     {
         path = path_finder.FindPath(transform.position, TargetPosition)?.ToArray();
+        path = RemoveLastWayPoints(path, StopBefore);
         SimplifiedPath = path_finder.SimplifyPath(path);
-         
     }
+
+    void FindPath(Transform target , int StopBefore = 0)
+    {
+        path = path_finder.FindPath(transform.position, target.position)?.ToArray();
+        path = RemoveLastWayPoints(path, StopBefore);
+        SimplifiedPath = path_finder.SimplifyPath(path);
+
+
+    }
+    Vector3[] RemoveLastWayPoints(Vector3[] waypointsArray,int waypointsNumber)
+    {
+        Vector3[] newPath = new Vector3[waypointsArray.Length - waypointsNumber];
+        for(int i = 0; i < newPath.Length; i++)
+        {
+            newPath[i] = waypointsArray[i];
+        }
+        return newPath;
+    }
+    
     void DrawPathGizmos()
     {
         if (path != null && ShowPathGizmos)
         {
             for (int i = 0; i < path.Length - 1; i++)
             {
-                Debug.DrawLine(path[i], path[i + 1], Color.red, 100f);
+                Debug.DrawLine(path[i], path[i + 1], Color.red, 10f);
             }
         }
 
@@ -104,6 +136,8 @@ public class MyCharacterController : MonoBehaviour
                         Quaternion.identity
                         );
                 }
+                ShowPathGizmos = false;
+
             }
 
         }
@@ -123,17 +157,31 @@ public class MyCharacterController : MonoBehaviour
                         Quaternion.identity
                         );
                 }
+                ShowPathGizmos = false;
+
             }
         }
     }
 
-    public void SetTarget(Vector3 target)
+    public void MoveToward(Vector3 target, int StopBefore = 0)
     {
         TargetPosition = target;
 
         currentWayPointIndex = 0;
         StopMoving();
-        FindPath();
+        FindPath(StopBefore);
+        //Move();
+    }
+
+    public void SetTarget(Transform target, int StopBefore = 0)
+    {
+        Target = target;
+        TargetPosition = target.position;
+
+        currentWayPointIndex = 0;
+        StopMoving();
+        FindPath(Target, StopBefore);
+        //Move();
     }
     public void StopMoving()
     {

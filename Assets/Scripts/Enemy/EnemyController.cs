@@ -13,17 +13,13 @@ public class EnemyController : MonoBehaviour
     {
 
         characterController = GetComponent<MyCharacterController>();
+        Transform target = GameObject.Find("citizen").transform;
+        characterController.SetTarget(target, 1);
     }
 
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 targetPos = GetMouseWorldPosition();
-            characterController.SetTarget(targetPos);
-        }
 
     }
 

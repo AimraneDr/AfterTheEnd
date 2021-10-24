@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53cde1f8a8e776f4b9e033249c08dd7b, type: 3}
-  m_Name: cube1x1
+  m_Name: Wall1x1
   m_EditorClassIdentifier: 
-  ID: 1
-  Name: cube1x1
-  Icon: {fileID: 21300000, guid: c1d34f13c86b5fd44adf35563f0ef7b1, type: 3}
-  Graphics: {fileID: 2246172806553625110, guid: 563fac1ca96073840b72f6ed96e122f1, type: 3}
-  ItemType: 2
-  Spisiality: 4
+  ID: 4
+  Name: Wall
+  Icon: {fileID: 0}
+  Graphics: {fileID: 8824989550338215456, guid: df330ea1a4f449a41b9f74fe5b60d4f8, type: 3}
+  ItemType: 0
+  Spisiality: 1
   tag: 0
   Layer:
     serializedVersion: 2
     m_Bits: 64
-  Health: 10
+  Health: 20
   Width: 1
   Length: 1
   Height: 1
-  Cost: 5
+  Cost: 10

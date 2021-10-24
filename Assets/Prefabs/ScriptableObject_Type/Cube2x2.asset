@@ -17,10 +17,13 @@ MonoBehaviour:
   Icon: {fileID: 21300000, guid: b86f885bf12e4f64ea0c08fc89850f72, type: 3}
   Graphics: {fileID: 5176758033122586140, guid: 02424a0aeeca05f40a55edd766eb0322, type: 3}
   ItemType: 2
+  Spisiality: 4
   tag: 0
+  Layer:
+    serializedVersion: 2
+    m_Bits: 64
   Health: 5
   Width: 2
   Length: 2
   Height: 1
-  Mesh_Renderer: {fileID: 0}
   Cost: 20

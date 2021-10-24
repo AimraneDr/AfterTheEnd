@@ -11,7 +11,9 @@ public class Item : ScriptableObject
     public Sprite Icon;
     public GameObject Graphics;
     public Type ItemType;
+    public Spicialities Spisiality;
     public Tag tag;
+    public LayerMask Layer;
     public enum Type
     {
         PlacableOnly,
@@ -24,5 +26,14 @@ public class Item : ScriptableObject
     {
         DeffenceWall,
         LiveHouse
+    }
+
+    public enum Spicialities
+    {
+        None,
+        Deffance,
+        Attack,
+        Heal,
+        Living,
     }
 }

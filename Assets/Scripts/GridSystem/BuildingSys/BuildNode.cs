@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BuildNode : GridObject<BuildNode>
 {
+    int FilledAmmount = 0;
+
     private GameObject _HoldedObject;
     private GameObject HoldedObject
     {

@@ -35,10 +35,10 @@ public class PlacableObject : Item ,IDamageable
             Quaternion.Euler(0, GetRotationAngle(dir), 0)
 
             );
-        obj.layer = LayerMask.NameToLayer("Buildings");
-        PlacementInfo component = obj.gameObject.AddComponent<PlacementInfo>() as PlacementInfo;
+        //obj.layer = Layer;
+        ObjectInfo component = obj.gameObject.AddComponent<ObjectInfo>() as ObjectInfo;
         component.SetProperties(Origin, dir, BookUpGridPlaces(Origin, dir));
-
+        component.Spisiality = Spisiality;
         FinalObj = obj;
     }
 
